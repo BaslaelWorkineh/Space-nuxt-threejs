@@ -1,6 +1,6 @@
 <template>
   <div>
-    <SpaceScene />
+    <NuxtPage />
   </div>
 </template>
 
@@ -14,6 +14,6 @@
 body {
   font-family: 'Arial', sans-serif;
   overflow: hidden;
-  background: #000;
+  background: #000000;
 }
 </style>

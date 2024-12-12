@@ -101,7 +101,9 @@ export function useSpaceScene() {
 
     // Create stars
     createStars();
-
+    createAsteroids();
+createBlackHole();
+fetchNasaData();
     // Create planets
     createPlanets();
     // makePlanetsMoreVisible();
@@ -170,6 +172,76 @@ export function useSpaceScene() {
   //   });
   // };
 
+  const createAsteroids = () => {
+    const asteroidCount = 50;
+    const asteroids: THREE.Mesh[] = [];
+  
+    for (let i = 0; i < asteroidCount; i++) {
+      const geometry = new THREE.SphereGeometry(0.5, 8, 8);
+      const material = new THREE.MeshStandardMaterial({ color: 0x808080 });
+      const asteroid = new THREE.Mesh(geometry, material);
+  
+      asteroid.position.set(
+        (Math.random() - 0.5) * 1000,
+        (Math.random() - 0.5) * 100,
+        (Math.random() - 0.5) * 1000
+      );
+  
+      asteroids.push(asteroid);
+      scene.add(asteroid);
+    }
+  
+    // Animate asteroids
+    const animateAsteroids = () => {
+      asteroids.forEach((asteroid) => {
+        asteroid.position.x += (Math.random() - 0.5) * 0.2;
+        asteroid.position.y += (Math.random() - 0.5) * 0.2;
+        asteroid.position.z += (Math.random() - 0.5) * 0.2;
+      });
+      requestAnimationFrame(animateAsteroids);
+    };
+    animateAsteroids();
+  };
+  
+  const createBlackHole = () => {
+    const geometry = new THREE.SphereGeometry(3, 32, 32);
+    const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    const blackHole = new THREE.Mesh(geometry, material);
+  
+    blackHole.position.set(0, -100, -200);
+    scene.add(blackHole);
+  
+    // Accretion disk
+    const diskGeometry = new THREE.RingGeometry(5, 20, 64);
+    const diskMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      side: THREE.DoubleSide,
+    });
+    const accretionDisk = new THREE.Mesh(diskGeometry, diskMaterial);
+    accretionDisk.rotation.x = Math.PI / 2;
+    blackHole.add(accretionDisk);
+  };
+
+  const fetchNasaData = async () => {
+    const apiKey = "NaGbRJ8hNaQHW9975uDd739PFb89aGs6ntgZzsk9"; // Replace with your NASA API key
+    const response = await fetch(
+      `https://api.nasa.gov/planetary/apod?api_key=${apiKey}`
+    );
+    const data = await response.json();
+  
+    // Display the data in the tooltip or create an object with the APOD image
+    if (data.url) {
+      const textureLoader = new THREE.TextureLoader();
+      const apodTexture = textureLoader.load(data.url);
+      const apodMaterial = new THREE.MeshBasicMaterial({ map: apodTexture });
+      const apodGeometry = new THREE.PlaneGeometry(20, 20);
+      const apodPlane = new THREE.Mesh(apodGeometry, apodMaterial);
+  
+      apodPlane.position.set(0, 0, -100);
+      scene.add(apodPlane);
+    }
+  };
+  
   const createStars = () => {
     const starsGeometry = new THREE.BufferGeometry();
     const starsCount = 10000;
